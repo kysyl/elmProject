@@ -1,7 +1,5 @@
 # An example SPA in Elm
 
-An example Elm single page application built for http://www.elm-tutorial.org/
-
 ## Setup
 
 - [Install Elm](http://elm-lang.org/install)
