@@ -1,7 +1,7 @@
 module Update exposing (..)
 
 import Commands exposing (saveQuizzCmd)
-import Models exposing (Model, Quizz)
+import Models exposing (Model, Quizz, Identity)
 import Msgs exposing (Msg)
 import Routing exposing (parseLocation)
 import RemoteData
@@ -20,18 +20,23 @@ update msg model =
             in
                 ( { model | route = newRoute }, Cmd.none )
 
-        Msgs.ChangeLevel identity howMuch ->
+        Msgs.ChangeLevel quizz howMuch ->
             let
-                updatedQuizz =
-                    { identity | age = identity.age + howMuch }
+                iden = quizz.identity
+                updatedIdent =
+                    { iden | age = iden.age + howMuch }
             in
-                ( model, saveQuizzCmd updatedQuizz )
+                ( model, saveQuizzCmd (updateIdentityInQuizz quizz updatedIdent)  )
 
         Msgs.OnQuizzSave (Ok quizz) ->
             ( updateQuizz model quizz, Cmd.none )
 
         Msgs.OnQuizzSave (Err error) ->
             ( model, Cmd.none )
+
+updateIdentityInQuizz : Quizz -> Identity -> Quizz
+updateIdentityInQuizz quizz iden =
+    { quizz | identity = iden }
 
 
 updateQuizz : Model -> Quizz -> Model

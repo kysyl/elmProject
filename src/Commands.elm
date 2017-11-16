@@ -38,7 +38,6 @@ saveQuizzRequest quizz =
         , withCredentials = False
         }
 
-
 saveQuizzCmd : Quizz -> Cmd Msg
 saveQuizzCmd quizz =
     saveQuizzRequest quizz
@@ -46,30 +45,12 @@ saveQuizzCmd quizz =
 
 -- DECODERS1
 
-userDecoder : Decode.Decoder User
-userDecoder =
-    decode User
-        |> required "id" Decode.string
-        |> required "name" Decode.string
-        |> required "identity" identityDecoder
-
-
 identityDecoder : Decode.Decoder Identity
 identityDecoder =
     decode Identity
         |> required "age" Decode.int
         |> required "sex" Decode.string
 
-userEncoder : User -> Encode.Value
-userEncoder user =
-    let
-        attributes =
-            [ ( "id", Encode.string user.id )
-            , ( "name", Encode.string user.name )
-            , ( "identity", identityEncoder user.identity )
-            ]
-    in
-        Encode.object attributes
 
 identityEncoder : Identity -> Encode.Value
 identityEncoder identity =

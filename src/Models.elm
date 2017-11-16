@@ -32,6 +32,30 @@ type alias Quizz =
         identity : Identity
     }
 
+type alias Question =
+    {
+        id: QuestionId,
+        questionText: String,
+        questionType: QuestionType,
+        answers: List AnswerId,
+        responses: List Responses
+    }
+type alias QuestionId =
+    String
+
+type alias QuestionType =
+    String
+
+type alias AnswerId =
+    Int
+
+type alias Responses =
+    {
+       id: AnswerId,
+       content: String,
+       isAnswer: Bool 
+    }
+
 type alias UserId =
     String
 
@@ -45,9 +69,28 @@ type alias User =
     {
         id : UserId,
         name : String,
-        identity : Identity
+        quizzs : List QuizzUser
     }
 
+type alias QuizzUser =
+    {
+        id : QuizzId,
+        quizzState: String,
+        questions: List QuestionUser
+    }
+
+type alias QuestionUser =
+    {
+        id : QuestionId,
+        answers : List AnswerId,
+        responses : List AnswerUser
+    }
+
+type alias AnswerUser =
+    {
+        id : AnswerId,
+        isChosen : Bool
+    }
 
 type Route
     = QuizzsRoute
