@@ -1,4 +1,4 @@
-# An example SPA in Elm
+# Gestion de quizzs en Elm
 
 ## Setup
 
