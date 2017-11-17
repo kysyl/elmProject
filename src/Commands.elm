@@ -5,7 +5,7 @@ import Json.Decode as Decode
 import Json.Decode.Pipeline exposing (decode, required)
 import Json.Encode as Encode
 import Msgs exposing (Msg)
-import Models exposing (QuizzId, Quizz, User, Identity)
+import Models exposing (..)
 import RemoteData
 
 
@@ -23,7 +23,7 @@ fetchQuizzsUrl =
 
 saveQuizzUrl : QuizzId -> String
 saveQuizzUrl quizzId =
-    "http://localhost:4000/quizzs/" ++ quizzId
+    "http://localhost:4000/quizzs/" ++ toString quizzId
 
 
 saveQuizzRequest : Quizz -> Http.Request Quizz
@@ -68,21 +68,38 @@ quizzsDecoder : Decode.Decoder (List Quizz)
 quizzsDecoder =
     Decode.list quizzDecoder
 
-
 quizzDecoder : Decode.Decoder Quizz
 quizzDecoder =
     decode Quizz
-        |> required "id" Decode.string
+        |> required "id" Decode.int
         |> required "name" Decode.string
+        |> required "questions" (Decode.list questionDecoder)
         |> required "level" Decode.int
         |> required "identity" identityDecoder
 
+
+questionDecoder : Decode.Decoder Question
+questionDecoder =
+    decode Question
+        |> required "id" Decode.int
+        |> required "questionText" Decode.string
+        |> required "questionType" Decode.string
+        |> required "answers" (Decode.list Decode.int)
+        |> required "responses" (Decode.list responseDecoder)
+        
+
+responseDecoder : Decode.Decoder Response
+responseDecoder =
+    decode Response
+        |> required "id" Decode.int
+        |> required "content" Decode.string
+        |> required "isAnswer" Decode.bool
 
 quizzEncoder : Quizz -> Encode.Value
 quizzEncoder quizz =
     let
         attributes =
-            [ ( "id", Encode.string quizz.id )
+            [ ( "id", Encode.int quizz.id )
             , ( "name", Encode.string quizz.name )
             , ( "level", Encode.int quizz.level )
             , ( "identity", identityEncoder quizz.identity )

@@ -1,11 +1,11 @@
 {
   "quizzs": [
     {
-      "id": 1,
+      "id": "2",
       "name": "Lance",
       "questions": [
         {
-          "id": 1,
+          "id": "id",
           "questionText": "quel est mon nom?",
           "questionType": "single",
           "answers": [
@@ -37,7 +37,7 @@
       }
     },
     {
-      "id": 2,
+      "id": "3",
       "name": "Aki",
       "questions": [
         {
@@ -109,17 +109,11 @@
   "user": {
     "name": "Andrew",
     "userId": 34,
-    "quizzs": [
+    "questions": [
       {
         "id": 1,
-        "quizzState": "finished",
-        "questions": [
-          {
-            "id": 1,
-            "answers": [
-              2
-            ]
-          }
+        "answers": [
+          2
         ]
       }
     ]

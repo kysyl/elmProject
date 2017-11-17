@@ -21,13 +21,14 @@ initialModel route =
 
 
 type alias QuizzId =
-    String
+    Int
 
 
 type alias Quizz =
-    { 
+    {
         id : QuizzId, 
         name : String,
+        questions : List Question,
         level : Int,
         identity : Identity
     }
@@ -38,10 +39,11 @@ type alias Question =
         questionText: String,
         questionType: QuestionType,
         answers: List AnswerId,
-        responses: List Responses
+        responses: List Response
     }
+
 type alias QuestionId =
-    String
+    Int
 
 type alias QuestionType =
     String
@@ -49,7 +51,7 @@ type alias QuestionType =
 type alias AnswerId =
     Int
 
-type alias Responses =
+type alias Response =
     {
        id: AnswerId,
        content: String,

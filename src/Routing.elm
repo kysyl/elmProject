@@ -9,7 +9,7 @@ matchers : Parser (Route -> a) a
 matchers =
     oneOf
         [ map QuizzsRoute top
-        , map QuizzRoute (s "quizzs" </> string)
+        , map QuizzRoute (s "quizzs" </> int)
         , map QuizzsRoute (s "quizzs")
         ]
 
@@ -31,4 +31,4 @@ quizzsPath =
 
 quizzPath : QuizzId -> String
 quizzPath id =
-    "#quizzs/" ++ id
+    "#quizzs/" ++ toString id

@@ -58,7 +58,7 @@ list quizzs =
 quizzRow : Quizz -> Html Msg
 quizzRow quizz =
     tr []
-        [ td [] [ text quizz.id ]
+        [ td [] [ text (toString quizz.id) ]
         , td [] [ text quizz.name ]
         , td [] [ text (toString quizz.level) ]
         , td []
