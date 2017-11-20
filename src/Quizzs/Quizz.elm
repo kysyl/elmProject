@@ -3,45 +3,45 @@ module Quizzs.Quizz exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (class, value, href)
 import Html.Events exposing (onClick)
-import Models exposing (Quizz)
+import Models exposing (Quizz, QuizzUser)
 import Msgs exposing (Msg)
 import Routing exposing (quizzsPath)
 
 
-view : Quizz -> Html.Html Msg
-view model =
+view : Quizz -> QuizzUser -> Html.Html Msg
+view quizz userQuizz =
     div []
-        [ nav model
-        , form model
+        [ nav quizz
+        , form quizz userQuizz
         ]
 
 
 nav : Quizz -> Html.Html Msg
-nav model =
+nav quizz =
     div [ class "clearfix mb2 white bg-black p1" ]
         [ listBtn ]
 
 
-form : Quizz -> Html.Html Msg
-form quizz =
+form : Quizz  -> QuizzUser -> Html.Html Msg
+form quizz userQuizz =
     div [ class "m3" ]
         [ h1 [] [ text quizz.name ]
-        , formLevel quizz
+        , formLevel quizz userQuizz
         ]
 
 
-formLevel : Quizz -> Html.Html Msg
-formLevel quizz =
+formLevel : Quizz  -> QuizzUser -> Html.Html Msg
+formLevel quizz userQuizz =
     div
         [ class "clearfix py1"
         ]
-        [ div [ class "col col-5" ] [ text "Age" ]
+        [ div [ class "col col-5" ] [ text userQuizz.quizzState ]
         , div [ class "col col-7" ]
             [ span [ class "h2 bold" ] [ text (toString quizz.identity.age) ]
             , btnLevelDecrease quizz
             , btnLevelIncrease quizz
             ]
-        ]
+        ]   
 
 
 btnLevelDecrease : Quizz -> Html.Html Msg

@@ -1,11 +1,11 @@
 {
   "quizzs": [
     {
-      "id": "2",
-      "name": "Lance",
+      "id": 1,
+      "name": "First Quizz",
       "questions": [
         {
-          "id": "id",
+          "id": 1,
           "questionText": "quel est mon nom?",
           "questionType": "single",
           "answers": [
@@ -14,17 +14,17 @@
           "responses": [
             {
               "id": 1,
-              "text": "Harry",
+              "content": "Harry",
               "isAnswer": false
             },
             {
               "id": 2,
-              "text": "Jon",
+              "content": "Jon",
               "isAnswer": false
             },
             {
               "id": 3,
-              "text": "Paul",
+              "content": "Paul",
               "isAnswer": true
             }
           ]
@@ -32,16 +32,16 @@
       ],
       "level": 29,
       "identity": {
-        "age": 42,
+        "age": 48,
         "sex": "adrien"
       }
     },
     {
-      "id": "3",
-      "name": "Aki",
+      "id": 2,
+      "name": "LE deuxième quizz",
       "questions": [
         {
-          "id": "id",
+          "id": 0,
           "questionText": "quel est mon nom?",
           "questionType": "single",
           "answers": [
@@ -50,17 +50,17 @@
           "responses": [
             {
               "id": 1,
-              "text": "Harry",
+              "content": "Harry",
               "isAnswer": false
             },
             {
               "id": 2,
-              "text": "Jon",
+              "content": "Jon",
               "isAnswer": false
             },
             {
               "id": 3,
-              "text": "Paul",
+              "content": "Paul",
               "isAnswer": true
             }
           ]
@@ -73,47 +73,34 @@
       }
     }
   ],
-  "quizzsdf": [
-    {
-      "id": 1,
-      "name": "premier quizz",
-      "questions": [
-        {
-          "id": "id",
-          "questionText": "quel est mon nom?",
-          "questionType": "single",
-          "answers": [
-            3
-          ],
-          "responses": [
-            {
-              "id": 1,
-              "text": "Harry",
-              "isAnswer": false
-            },
-            {
-              "id": 2,
-              "text": "Jon",
-              "isAnswer": false
-            },
-            {
-              "id": 3,
-              "text": "Paul",
-              "isAnswer": true
-            }
-          ]
-        }
-      ]
-    }
-  ],
   "user": {
     "name": "Andrew",
     "userId": 34,
-    "questions": [
+    "quizzs": [
       {
         "id": 1,
-        "answers": [
-          2
+        "quizzState": "finished",
+        "questions": [
+          {
+            "id": 1,
+            "answers": [
+              2
+            ],
+            "reponses": [
+              {
+                "id": 1,
+                "isChosen": false
+              },
+              {
+                "id": 2,
+                "isChosen": true
+              },
+              {
+                "id": 3,
+                "isChosen": false
+              }
+            ]
+          }
         ]
       }
     ]

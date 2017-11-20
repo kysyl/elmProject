@@ -1,6 +1,6 @@
 module Update exposing (..)
 
-import Commands exposing (saveQuizzCmd)
+import Commands exposing (saveQuizzCmd, fetchUser)
 import Models exposing (Model, Quizz, Identity)
 import Msgs exposing (Msg)
 import Routing exposing (parseLocation)
@@ -11,7 +11,10 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Msgs.OnFetchQuizzs response ->
-            ( { model | quizzs = response }, Cmd.none )
+            ( { model | quizzs = response }, fetchUser )
+
+        Msgs.OnFetchUser response ->
+            ( { model | user = response }, Cmd.none )
 
         Msgs.OnLocationChange location ->
             let

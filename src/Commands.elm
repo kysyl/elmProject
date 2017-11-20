@@ -10,15 +10,24 @@ import RemoteData
 
 
 fetchQuizzs : Cmd Msg
-fetchQuizzs =
+fetchQuizzs  =
     Http.get fetchQuizzsUrl quizzsDecoder
         |> RemoteData.sendRequest
         |> Cmd.map Msgs.OnFetchQuizzs
 
+fetchUser : Cmd Msg
+fetchUser  =
+    Http.get fetchUserUrl userDecoder
+        |> RemoteData.sendRequest
+        |> Cmd.map Msgs.OnFetchUser
 
 fetchQuizzsUrl : String
 fetchQuizzsUrl =
     "http://localhost:4000/quizzs"
+
+fetchUserUrl : String
+fetchUserUrl =
+    "http://localhost:4000/user"
 
 
 saveQuizzUrl : QuizzId -> String
@@ -62,7 +71,33 @@ identityEncoder identity =
     in
         Encode.object attributes
 -- DECODERS
+    
+userDecoder : Decode.Decoder User
+userDecoder =
+    decode User
+        |> required "id" Decode.int
+        |> required "name" Decode.string
+        |> required "quizzs" (Decode.list quizzUserDecoder)
 
+quizzUserDecoder : Decode.Decoder QuizzUser
+quizzUserDecoder =
+    decode QuizzUser
+        |> required "id" Decode.int
+        |> required "quizzState" Decode.string
+        |> required "questions" (Decode.list questionUserDecoder)
+
+questionUserDecoder : Decode.Decoder QuestionUser
+questionUserDecoder =
+    decode QuestionUser
+        |> required "id" Decode.int
+        |> required "answers" (Decode.list Decode.int)
+        |> required "responses" (Decode.list answerUserrDecoder)
+
+answerUserrDecoder : Decode.Decoder AnswerUser
+answerUserrDecoder =
+    decode AnswerUser
+        |> required "id" Decode.int
+        |> required "isChosen" Decode.bool
 
 quizzsDecoder : Decode.Decoder (List Quizz)
 quizzsDecoder =
@@ -77,6 +112,19 @@ quizzDecoder =
         |> required "level" Decode.int
         |> required "identity" identityDecoder
 
+quizzEncoder : Quizz -> Encode.Value
+quizzEncoder quizz =
+    let
+        attributes =
+            [ ( "id", Encode.int quizz.id )
+            , ( "name", Encode.string quizz.name )
+            , ( "level", Encode.int quizz.level )
+            , ( "questions", (Encode.list <| List.map questionEncoder  quizz.questions) )
+            , ( "identity", identityEncoder quizz.identity )
+            ]
+    in
+        Encode.object attributes
+
 
 questionDecoder : Decode.Decoder Question
 questionDecoder =
@@ -87,6 +135,18 @@ questionDecoder =
         |> required "answers" (Decode.list Decode.int)
         |> required "responses" (Decode.list responseDecoder)
         
+questionEncoder : Question -> Encode.Value
+questionEncoder question =
+    let
+        attributes =
+            [ ( "id", Encode.int question.id )
+            , ( "questionText", Encode.string question.questionText )
+            , ( "questionType", Encode.string question.questionType )
+            , ( "answers", Encode.list <| List.map Encode.int question.answers)
+            , ( "responses", Encode.list <| List.map responseEncoder question.responses)
+            ]
+    in
+        Encode.object attributes
 
 responseDecoder : Decode.Decoder Response
 responseDecoder =
@@ -95,14 +155,13 @@ responseDecoder =
         |> required "content" Decode.string
         |> required "isAnswer" Decode.bool
 
-quizzEncoder : Quizz -> Encode.Value
-quizzEncoder quizz =
+responseEncoder : Response -> Encode.Value
+responseEncoder response =
     let
         attributes =
-            [ ( "id", Encode.int quizz.id )
-            , ( "name", Encode.string quizz.name )
-            , ( "level", Encode.int quizz.level )
-            , ( "identity", identityEncoder quizz.identity )
+            [ ( "id", Encode.int response.id )
+            , ( "content", Encode.string response.content )
+            , ( "isAnswer", Encode.bool response.isAnswer)
             ]
     in
         Encode.object attributes
