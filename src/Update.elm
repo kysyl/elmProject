@@ -1,7 +1,7 @@
 module Update exposing (..)
 
 import Commands exposing (saveQuizzCmd, fetchUser)
-import Models exposing (Model, Quizz, Identity)
+import Models exposing (Model, Quizz, Identity, User)
 import Msgs exposing (Msg)
 import Routing exposing (parseLocation)
 import RemoteData
@@ -33,10 +33,17 @@ update msg model =
 
         Msgs.OnQuizzSave (Ok quizz) ->
             ( updateQuizz model quizz, Cmd.none )
-
+        
         Msgs.OnQuizzSave (Err error) ->
             ( model, Cmd.none )
 
+        Msgs.OnUserSave (Ok user) ->
+            ( updateUser model user, Cmd.none )
+
+        Msgs.OnUserSave (Err error) ->
+            ( model, Cmd.none )
+
+        
 updateIdentityInQuizz : Quizz -> Identity -> Quizz
 updateIdentityInQuizz quizz iden =
     { quizz | identity = iden }
@@ -58,3 +65,11 @@ updateQuizz model updatedQuizz =
             RemoteData.map updateQuizzList model.quizzs
     in
         { model | quizzs = updatedQuizzs }
+
+updateUser : Model -> User -> Model
+updateUser model user =
+    let
+        updatedUser =
+            RemoteData.Success user
+    in
+         { model | user = updatedUser }

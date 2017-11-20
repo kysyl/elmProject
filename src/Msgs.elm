@@ -1,7 +1,7 @@
 module Msgs exposing (..)
 
 import Http
-import Models exposing (Quizz, QuizzId, User)
+import Models exposing (Quizz, QuizzId, User, QuizzUser)
 import Navigation exposing (Location)
 import RemoteData exposing (WebData)
 
@@ -12,3 +12,4 @@ type Msg
     | OnLocationChange Location
     | ChangeLevel Quizz Int
     | OnQuizzSave (Result Http.Error Quizz)
+    | OnUserSave (Result Http.Error User)

@@ -1,7 +1,8 @@
 module View exposing (..)
 
 import Html exposing (Html, div, text)
-import Models exposing (Model, QuizzId, Quizz)
+import Commands exposing (saveUserCmd)
+import Models exposing (Model, QuizzId, Quizz, QuizzUser, User, QuestionUser, Question, Response, AnswerUser)
 import Msgs exposing (Msg)
 import Quizzs.Quizz
 import Quizzs.List
@@ -74,7 +75,7 @@ userQuizzPage model quizz quizzId =
                         Quizzs.Quizz.view quizz userQuizz
 
                     Nothing ->
-                        notFoundViewUser
+                        createUserQuizz user quizz quizzId
 
         RemoteData.Failure err ->
             text (toString err)
@@ -91,3 +92,36 @@ notFoundViewUser =
     div []
         [ text "Not found USER Quizz"
         ]
+
+createQuestionsUser : List Question -> List QuestionUser
+createQuestionsUser questions =
+    List.map createQuestionUser questions
+
+createQuestionUser : Question -> QuestionUser
+createQuestionUser question = 
+    QuestionUser question.id [] (createResponsesUser question.responses)
+
+createResponsesUser : List Response -> List AnswerUser
+createResponsesUser responses =
+    List.map createResponseUser responses
+
+createResponseUser : Response -> AnswerUser
+createResponseUser reponse =
+    AnswerUser reponse.id False
+
+createUserQuizz : User -> Quizz -> QuizzId -> Html Msg
+createUserQuizz user quizz quizzId =
+    let
+        quizzUser : QuizzUser
+        quizzUser = 
+        {
+            id = quizz.id
+        ,   quizzState = "started"
+        ,   questions = createQuestionsUser quizz.questions
+
+        }
+        updatedUser =
+             { user | quizzs = quizzUser :: user.quizzs }
+        message = saveUserCmd updatedUser
+    in
+        Quizzs.Quizz.view quizz quizzUser
