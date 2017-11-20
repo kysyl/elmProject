@@ -6,6 +6,7 @@ import Models exposing (Model, QuizzId, Quizz, QuizzUser, User, QuestionUser, Qu
 import Msgs exposing (Msg)
 import Quizzs.Quizz
 import Quizzs.List
+import Quizzs.QuizzValidated
 import RemoteData
 
 
@@ -13,7 +14,7 @@ view : Model -> Html Msg
 view model =
     div []
         [ page model ]
-        
+
 
 page : Model -> Html Msg
 page model =
@@ -72,8 +73,11 @@ userQuizzPage model quizz quizzId =
             in
                 case maybeUserQuizz of
                     Just userQuizz ->
-                        Quizzs.Quizz.view quizz userQuizz
-
+                        case userQuizz.quizzState of
+                            "started" ->
+                                Quizzs.Quizz.view quizz userQuizz
+                            other ->
+                                Quizzs.QuizzValidated.view quizz userQuizz 
                     Nothing ->
                         createUserQuizz user quizz quizzId
 
@@ -98,7 +102,7 @@ createQuestionsUser questions =
     List.map createQuestionUser questions
 
 createQuestionUser : Question -> QuestionUser
-createQuestionUser question = 
+createQuestionUser question =
     QuestionUser question.id [] (createResponsesUser question.responses)
 
 createResponsesUser : List Response -> List AnswerUser
@@ -113,7 +117,7 @@ createUserQuizz : User -> Quizz -> QuizzId -> Html Msg
 createUserQuizz user quizz quizzId =
     let
         quizzUser : QuizzUser
-        quizzUser = 
+        quizzUser =
         {
             id = quizz.id
         ,   quizzState = "started"
