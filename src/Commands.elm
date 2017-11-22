@@ -34,9 +34,9 @@ saveQuizzUrl : QuizzId -> String
 saveQuizzUrl quizzId =
     "http://localhost:4000/quizzs/" ++ toString quizzId
 
-saveUserUrl : UserId -> String
-saveUserUrl userId =
-    "http://localhost:4000/user/" ++ toString userId
+saveUserUrl : String
+saveUserUrl =
+    "http://localhost:4000/user"
 
 saveQuizzRequest : Quizz -> Http.Request Quizz
 saveQuizzRequest quizz =
@@ -58,7 +58,7 @@ saveUserRequest user =
         , headers = []
         , method = "PATCH"
         , timeout = Nothing
-        , url = saveUserUrl user.id
+        , url = saveUserUrl
         , withCredentials = False
         }
 
@@ -72,24 +72,6 @@ saveUserCmd user =
     saveUserRequest user
         |> Http.send Msgs.OnUserSave
 
--- DECODERS1
-
-identityDecoder : Decode.Decoder Identity
-identityDecoder =
-    decode Identity
-        |> required "age" Decode.int
-        |> required "sex" Decode.string
-
-
-identityEncoder : Identity -> Encode.Value
-identityEncoder identity =
-    let
-        attributes =
-            [ ( "age", Encode.int identity.age )
-            , ( "sex", Encode.string identity.sex )
-            ]
-    in
-        Encode.object attributes
 -- DECODERS
     
 userDecoder : Decode.Decoder User
@@ -133,7 +115,6 @@ questionUserDecoder =
     decode QuestionUser
         |> required "id" Decode.int
         |> required "answers" (Decode.list Decode.int)
-        |> required "responses" (Decode.list answerUserrDecoder)
 
 questionUserEncoder : QuestionUser -> Encode.Value
 questionUserEncoder questionUser =
@@ -141,23 +122,6 @@ questionUserEncoder questionUser =
         attributes =
             [ ( "id", Encode.int questionUser.id )
             , ( "answers", Encode.list <| List.map Encode.int questionUser.answers)
-            , ( "responses", Encode.list <| List.map answerUserrEncoder questionUser.responses)
-            ]
-    in
-        Encode.object attributes
-
-answerUserrDecoder : Decode.Decoder AnswerUser
-answerUserrDecoder =
-    decode AnswerUser
-        |> required "id" Decode.int
-        |> required "isChosen" Decode.bool
-
-answerUserrEncoder : AnswerUser -> Encode.Value
-answerUserrEncoder answerUser =
-    let
-        attributes =
-            [ ( "id", Encode.int answerUser.id )
-            , ( "isChosen", Encode.bool answerUser.isChosen)
             ]
     in
         Encode.object attributes
@@ -172,8 +136,6 @@ quizzDecoder =
         |> required "id" Decode.int
         |> required "name" Decode.string
         |> required "questions" (Decode.list questionDecoder)
-        |> required "level" Decode.int
-        |> required "identity" identityDecoder
 
 quizzEncoder : Quizz -> Encode.Value
 quizzEncoder quizz =
@@ -181,9 +143,7 @@ quizzEncoder quizz =
         attributes =
             [ ( "id", Encode.int quizz.id )
             , ( "name", Encode.string quizz.name )
-            , ( "level", Encode.int quizz.level )
             , ( "questions", (Encode.list <| List.map questionEncoder  quizz.questions) )
-            , ( "identity", identityEncoder quizz.identity )
             ]
     in
         Encode.object attributes

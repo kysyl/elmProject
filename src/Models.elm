@@ -26,8 +26,6 @@ type alias Quizz =
     { id : QuizzId
     , name : String
     , questions : List Question
-    , level : Int
-    , identity : Identity
     }
 
 
@@ -62,13 +60,6 @@ type alias Response =
 type alias UserId =
     Int
 
-
-type alias Identity =
-    { age : Int
-    , sex : String
-    }
-
-
 type alias User =
     { id : UserId
     , name : String
@@ -86,13 +77,6 @@ type alias QuizzUser =
 type alias QuestionUser =
     { id : QuestionId
     , answers : List AnswerId
-    , responses : List AnswerUser
-    }
-
-
-type alias AnswerUser =
-    { id : AnswerId
-    , isChosen : Bool
     }
 
 

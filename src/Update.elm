@@ -1,7 +1,7 @@
 module Update exposing (..)
 
-import Commands exposing (saveQuizzCmd, fetchUser)
-import Models exposing (Model, Quizz, Identity, User)
+import Commands exposing (saveQuizzCmd, fetchUser, saveUserCmd)
+import Models exposing (Model, Quizz, User, Question, QuestionUser, Response, QuizzId, QuizzUser)
 import Msgs exposing (Msg)
 import Routing exposing (parseLocation)
 import RemoteData
@@ -23,13 +23,12 @@ update msg model =
             in
                 ( { model | route = newRoute }, Cmd.none )
 
-        Msgs.ChangeLevel quizz howMuch ->
-            let
-                iden = quizz.identity
-                updatedIdent =
-                    { iden | age = iden.age + howMuch }
+        Msgs.UpdateAnswer quizz question response user ->
+            let 
+                updatedUser =
+                    findUserQuizz quizz user question response
             in
-                ( model, saveQuizzCmd (updateIdentityInQuizz quizz updatedIdent)  )
+                ( model, saveUserCmd (updatedUser)  )
 
         Msgs.OnQuizzSave (Ok quizz) ->
             ( updateQuizz model quizz, Cmd.none )
@@ -42,11 +41,6 @@ update msg model =
 
         Msgs.OnUserSave (Err error) ->
             ( model, Cmd.none )
-
-        
-updateIdentityInQuizz : Quizz -> Identity -> Quizz
-updateIdentityInQuizz quizz iden =
-    { quizz | identity = iden }
 
 
 updateQuizz : Model -> Quizz -> Model
@@ -73,3 +67,96 @@ updateUser model user =
             RemoteData.Success user
     in
          { model | user = updatedUser }
+
+
+findUserQuizz : Quizz -> User -> Question -> Response -> User
+findUserQuizz quizz user question response =
+    let
+        quizzId = quizz.id
+        maybeUserQuizz =
+            user.quizzs
+                |> List.filter (\user -> user.id == quizzId)
+                |> List.head
+    in
+        case maybeUserQuizz of
+            Just userQuizz ->
+
+                let
+                    questionId = question.id
+                    maybeUserQuestion =
+                        userQuizz.questions
+                            |> List.filter (\qu -> qu.id == questionId)
+                            |> List.head
+                in
+                    case maybeUserQuestion of
+                        Just userQuestion ->
+                            let
+                                newUserQuestion = {userQuestion | answers = [response.id]}
+                                pick qu =
+                                    if newUserQuestion.id == qu.id then
+                                        newUserQuestion
+                                    else
+                                        qu
+
+                                updateUserQuestionList questions =
+                                    List.map pick questions
+
+                                updatedUserQuestionList =
+                                    updateUserQuestionList userQuizz.questions
+                                updatedUserQuizz = {userQuizz | questions = updatedUserQuestionList}
+
+                                pick2 qu =
+                                    if updatedUserQuizz.id == qu.id then
+                                        updatedUserQuizz
+                                    else
+                                        qu
+
+                                updateUserQuizzs quizzs =
+                                    List.map pick2 quizzs
+
+                                updatedQuizzs =
+                                    updateUserQuizzs user.quizzs
+
+                            in
+                                 {user | quizzs = updatedQuizzs}
+                        Nothing ->
+                            let
+                                newQuestionUser =
+                                    createQuestionUser response question
+                                updatedUserQuizz = 
+                                    {userQuizz | questions = newQuestionUser :: userQuizz.questions}
+
+                                pick2 qu =
+                                    if updatedUserQuizz.id == qu.id then
+                                        updatedUserQuizz
+                                    else
+                                        qu
+
+                                updateUserQuizzs quizzs =
+                                    List.map pick2 quizzs
+
+                                updatedQuizzs =
+                                    updateUserQuizzs user.quizzs
+                                
+                            in
+                               {user | quizzs = updatedQuizzs}
+
+            Nothing ->
+                let
+                    newUserQuizz =
+                        createUserQuizz user quizz quizz.id response
+                in
+                    {user | quizzs = newUserQuizz :: user.quizzs}
+  
+createUserQuizz : User -> Quizz -> QuizzId -> Response -> QuizzUser
+createUserQuizz user quizz quizzId response =
+    QuizzUser quizz.id "started" (createQuestionsUser quizz.questions response)              
+
+createQuestionsUser : List Question -> Response -> List QuestionUser
+createQuestionsUser questions response =
+    List.map (createQuestionUser response) questions
+
+createQuestionUser : Response -> Question -> QuestionUser
+createQuestionUser response question =
+    QuestionUser question.id [response.id]
+

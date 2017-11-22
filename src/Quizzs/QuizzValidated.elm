@@ -1,18 +1,18 @@
 module Quizzs.QuizzValidated exposing (..)
 
 import Html exposing (..)
-import Html.Attributes exposing (class, value, href)
+import Html.Attributes exposing (class, href, value)
 import Html.Events exposing (onClick)
-import Models exposing (Quizz, QuizzUser)
+import Models exposing (Quizz, QuizzUser, Question, QuestionUser, Response, User)
 import Msgs exposing (Msg)
 import Routing exposing (quizzsPath)
 
 
-view : Quizz -> QuizzUser -> Html.Html Msg
-view quizz userQuizz =
+view : Quizz -> User -> Html.Html Msg
+view quizz user =
     div []
         [ nav quizz
-        , form quizz userQuizz
+        , content quizz user
         ]
 
 
@@ -22,52 +22,69 @@ nav quizz =
         [ listBtn ]
 
 
-form : Quizz  -> QuizzUser -> Html.Html Msg
-form quizz userQuizz =
-    div [ class "m3" ]
+content : Quizz -> User -> Html.Html Msg
+content quizz user =
+    div [ class "m3 container" ]
         [ h1 [] [ text quizz.name ]
-        , formLevel quizz userQuizz
+        , div [] (List.map (questionsDisplay user quizz) quizz.questions)
         ]
 
 
-formLevel : Quizz  -> QuizzUser -> Html.Html Msg
-formLevel quizz userQuizz =
+questionsDisplay : User -> Quizz -> Question -> Html.Html Msg
+questionsDisplay user quizz question =
     div
-        [ class "clearfix py1"
+        [ class "clearfix py1 col col-8" ]
+        [ div [ class "title" ] [ h2 [] [text question.questionText] ]
+        , div [] [ fieldset [] (List.map (responseDisplay quizz user question) question.responses) ]
         ]
-        [ div [ class "col col-5" ] [ text userQuizz.quizzState ]
-        , div [ class "col col-7" ]
-            [ span [ class "h2 bold" ] [ text (toString quizz.identity.age) ]
-            , btnLevelDecrease quizz
-            , btnLevelIncrease quizz
-            ]
-        ]   
 
-
-btnLevelDecrease : Quizz -> Html.Html Msg
-btnLevelDecrease quizz =
+responseDisplay : Quizz -> User -> Question -> Response -> Html.Html Msg
+responseDisplay quizz user question response =
     let
         message =
-            Msgs.ChangeLevel quizz -1
+            Msgs.UpdateAnswer quizz question response user
+        isChecked = isCheckedOrNot quizz question response user 
     in
-        a [ class "btn ml1 h1", onClick message ]
-            [ i [ class "fa fa-minus-circle" ] [] ]
-
-
-btnLevelIncrease : Quizz -> Html.Html Msg
-btnLevelIncrease quizz =
-    let
-        message =
-            Msgs.ChangeLevel quizz 1
-    in
-        a [ class "btn ml1 h1", onClick message ]
-            [ i [ class "fa fa-plus-circle" ] [] ]
-
+        label [class "clearfix py1 col col-8"]
+                [ input [ Html.Attributes.type_ "radio", Html.Attributes.name "question", onClick message, Html.Attributes.checked isChecked ] []
+                , text response.content
+                ]
 
 listBtn : Html Msg
-listBtn =
+listBtn = 
     a
-        [ class "btn regular"
-        , href quizzsPath
+        [
+            class "btn regular"
+        ,   href quizzsPath
         ]
-        [ i [ class "fa fa-chevron-left mr1" ] [], text "List" ]
+        [ i [ class "fa fa-chevron-left mr1" ] [], text "Liste des quizzs"]
+
+isCheckedOrNot : Quizz -> Question -> Response -> User -> Bool
+isCheckedOrNot quizz question response user =
+    let
+        maybeUserQuizz = List.foldl (\qu acc -> 
+                    if (qu.id == quizz.id) 
+                    then Just qu
+                    else acc
+                )
+                Nothing
+                user.quizzs
+    in
+        case maybeUserQuizz of 
+            Nothing ->
+                False
+            Just userQuizz ->
+                let
+                    maybeQuestionQuizz = List.foldl (\qu acc -> 
+                            if (qu.id == question.id) 
+                            then Just qu
+                            else acc
+                        )
+                        Nothing
+                        userQuizz.questions
+                in 
+                    case maybeQuestionQuizz of
+                        Nothing ->
+                            False
+                        Just questionQuizz ->
+                            List.member response.id questionQuizz.answers

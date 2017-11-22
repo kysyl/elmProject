@@ -2,13 +2,12 @@ module View exposing (..)
 
 import Html exposing (Html, div, text)
 import Commands exposing (saveUserCmd)
-import Models exposing (Model, QuizzId, Quizz, QuizzUser, User, QuestionUser, Question, Response, AnswerUser)
+import Models exposing (Model, QuizzId, Quizz, QuizzUser, User, QuestionUser, Question, Response)
 import Msgs exposing (Msg)
 import Quizzs.Quizz
 import Quizzs.List
 import Quizzs.QuizzValidated
 import RemoteData
-
 
 view : Model -> Html Msg
 view model =
@@ -75,11 +74,11 @@ userQuizzPage model quizz quizzId =
                     Just userQuizz ->
                         case userQuizz.quizzState of
                             "started" ->
-                                Quizzs.Quizz.view quizz userQuizz
+                                Quizzs.Quizz.view quizz user
                             other ->
-                                Quizzs.QuizzValidated.view quizz userQuizz 
+                                Quizzs.QuizzValidated.view quizz user
                     Nothing ->
-                        createUserQuizz user quizz quizzId
+                        Quizzs.Quizz.view quizz user
 
         RemoteData.Failure err ->
             text (toString err)
@@ -96,36 +95,3 @@ notFoundViewUser =
     div []
         [ text "Not found USER Quizz"
         ]
-
-createQuestionsUser : List Question -> List QuestionUser
-createQuestionsUser questions =
-    List.map createQuestionUser questions
-
-createQuestionUser : Question -> QuestionUser
-createQuestionUser question =
-    QuestionUser question.id [] (createResponsesUser question.responses)
-
-createResponsesUser : List Response -> List AnswerUser
-createResponsesUser responses =
-    List.map createResponseUser responses
-
-createResponseUser : Response -> AnswerUser
-createResponseUser reponse =
-    AnswerUser reponse.id False
-
-createUserQuizz : User -> Quizz -> QuizzId -> Html Msg
-createUserQuizz user quizz quizzId =
-    let
-        quizzUser : QuizzUser
-        quizzUser =
-        {
-            id = quizz.id
-        ,   quizzState = "started"
-        ,   questions = createQuestionsUser quizz.questions
-
-        }
-        updatedUser =
-             { user | quizzs = quizzUser :: user.quizzs }
-        message = saveUserCmd updatedUser
-    in
-        Quizzs.Quizz.view quizz quizzUser

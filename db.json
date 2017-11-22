@@ -28,6 +28,31 @@
               "isAnswer": true
             }
           ]
+        },
+        {
+          "id": 2,
+          "questionText": "Quel est ce langage?",
+          "questionType": "single",
+          "answers": [
+            2
+          ],
+          "responses": [
+            {
+              "id": 1,
+              "content": "Javascript",
+              "isAnswer": false
+            },
+            {
+              "id": 2,
+              "content": "Elm",
+              "isAnswer": true
+            },
+            {
+              "id": 3,
+              "content": "Scala",
+              "isAnswer": false
+            }
+          ]
         }
       ],
       "level": 29,
@@ -79,26 +104,18 @@
     "quizzs": [
       {
         "id": 1,
-        "quizzState": "finished",
+        "quizzState": "started",
         "questions": [
+          {
+            "id": 2,
+            "answers": [
+              2
+            ]
+          },
           {
             "id": 1,
             "answers": [
               2
-            ],
-            "responses": [
-              {
-                "id": 1,
-                "isChosen": false
-              },
-              {
-                "id": 2,
-                "isChosen": true
-              },
-              {
-                "id": 3,
-                "isChosen": false
-              }
             ]
           }
         ]
